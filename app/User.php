@@ -36,4 +36,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        /* register a created model event with the dispatcher */
+        static::created(function ($user) {
+            /* on user created -> create profile */
+            $user->profile()->create();
+        });
+    }
 }

@@ -68915,7 +68915,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
  */
 
 
-__webpack_require__(/*! ./components/Example */ "./resources/js/components/Example.js");
+__webpack_require__(/*! ./components/ChooseAvatar */ "./resources/js/components/ChooseAvatar.js");
 
 /***/ }),
 
@@ -68964,10 +68964,10 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /***/ }),
 
-/***/ "./resources/js/components/Example.js":
-/*!********************************************!*\
-  !*** ./resources/js/components/Example.js ***!
-  \********************************************/
+/***/ "./resources/js/components/ChooseAvatar.js":
+/*!*************************************************!*\
+  !*** ./resources/js/components/ChooseAvatar.js ***!
+  \*************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -68979,27 +68979,44 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
 
 
+var $target = document.getElementById("choose-avatar");
 
-function Example() {
-  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "container"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "row justify-content-center"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "col-md-8"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "card"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "card-header"
-  }, "Example Component"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-    className: "card-body"
-  }, "I'm an example component!")))));
-}
+var ChooseAvatar = function ChooseAvatar() {
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    var $input = document.getElementById("avatar");
+    var $label = document.getElementById("avatar-label");
 
-/* harmony default export */ __webpack_exports__["default"] = (Example);
+    if ($input && $label) {
+      var handler = function handler() {
+        if ($input.value) {
+          $label.innerText = $input.value.toLowerCase().replace("c:\\fakepath\\", "");
+        } else {
+          $label.innerText = "Choose avatar";
+        }
+      };
 
-if (document.getElementById('example')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Example, null), document.getElementById('example'));
+      $input.addEventListener("input", handler);
+      return function () {
+        $input.removeEventListener("input", handler);
+      };
+    }
+  }, []);
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+    type: "file",
+    className: "custom-file-input",
+    id: "avatar",
+    name: "avatar"
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+    className: "custom-file-label",
+    htmlFor: "avatar",
+    id: "avatar-label"
+  }, "Choose avatar"));
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (ChooseAvatar);
+
+if ($target) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ChooseAvatar, null), $target);
 }
 
 /***/ }),

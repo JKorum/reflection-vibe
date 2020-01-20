@@ -18,5 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/profiles/{user}', 'ProfileController@show');
+Route::get('/profiles/{user}/edit', 'ProfileController@edit')->middleware('auth');
+Route::patch('/profiles/{user}', 'ProfileController@update')->middleware('auth');
 
 Route::get('/home', 'HomeController@index')->name('home');

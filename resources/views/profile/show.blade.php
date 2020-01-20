@@ -4,7 +4,7 @@
 <div class="container">
   <div class="row">
     <div class="col-2 pr-0">
-      <img src="https://source.unsplash.com/random/150x150" class='img-fluid rounded-circle'>
+      <img src="{{ $user->profile->getAvatar() }}" class='rounded-circle w-100'>
     </div>
     <div class="col-10">
       <div>
