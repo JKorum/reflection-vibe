@@ -17,13 +17,8 @@ class Profile extends Model
 
     public function getAvatar()
     {
-        $userId = request()->segment(2);
-        $user = User::find($userId);
-        $avatar = $user->profile->avatar;
-        if ($avatar) {
-            return "/storage/$avatar";
-        } else {
-            return "https://robohash.org/$userId.jpeg?size=200x200&bgset=bg1";
-        }
+        return $this->avatar ?
+            "/storage/$this->avatar" :
+            "https://robohash.org/$this->user_id.jpeg?size=200x200&bgset=bg1";
     }
 }

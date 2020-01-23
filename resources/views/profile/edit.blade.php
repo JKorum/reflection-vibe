@@ -36,7 +36,7 @@
           @enderror
         </div>
         <div class="custom-file mb-3">
-          <div id="choose-avatar"></div>
+          <div id="choose-image"></div>
         </div>
         <button type="submit" class="btn btn-outline-primary">Save</button>
       </form>

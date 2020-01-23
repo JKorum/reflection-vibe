@@ -17,6 +17,12 @@ Route::get('/', function () {
 
 Auth::routes();
 
+Route::get('/posts/create', 'PostController@create');
+Route::get('/posts/{post}', 'PostController@show');
+Route::post('/posts/{post}/like', 'LikeController@store');
+Route::get('/posts/{post}/likers', 'PostController@likers');
+Route::post('/posts', 'PostController@store');
+
 Route::get('/profiles/{user}', 'ProfileController@show');
 Route::get('/profiles/{user}/edit', 'ProfileController@edit')->middleware('auth');
 Route::patch('/profiles/{user}', 'ProfileController@update')->middleware('auth');
