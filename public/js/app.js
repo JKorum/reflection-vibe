@@ -69668,6 +69668,8 @@ __webpack_require__(/*! ./components/ImgActionBar */ "./resources/js/components/
 
 __webpack_require__(/*! ./components/ChooseImage */ "./resources/js/components/ChooseImage.js");
 
+__webpack_require__(/*! ./components/Comments */ "./resources/js/components/Comments.js");
+
 /***/ }),
 
 /***/ "./resources/js/bootstrap.js":
@@ -69785,6 +69787,103 @@ var ChooseImage = function ChooseImage() {
 
 if ($target) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ChooseImage, null), $target);
+}
+
+/***/ }),
+
+/***/ "./resources/js/components/Comments.js":
+/*!*********************************************!*\
+  !*** ./resources/js/components/Comments.js ***!
+  \*********************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+
+
+var $target = document.getElementById("comments-section");
+
+var Comments = function Comments() {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "input-group"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
+    name: "comment",
+    className: "form-control border-0 pl-0 pr-0",
+    placeholder: "Post a comment",
+    rows: "1",
+    style: {
+      resize: "none",
+      boxShadow: "none",
+      background: "inherit"
+    }
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "input-group-append"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+    className: "btn btn-link text-decoration-none",
+    type: "submit"
+  }, "Post")))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", {
+    className: "mt-2 mb-2"
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "d-flex mb-3"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+    src: "https://source.unsplash.com/random/30x30",
+    className: "rounded-circle"
+  })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "mb-0"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+    className: "font-weight-bold"
+  }, "Lori "), "Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, quod."), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+    className: "text-muted"
+  }, "Posted 12/05/2019")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, "\xD7")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "d-flex mb-3"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+    src: "https://source.unsplash.com/random/30x30",
+    className: "rounded-circle"
+  })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "mb-0"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+    className: "font-weight-bold"
+  }, "Lori "), "Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, quod."), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+    className: "text-muted"
+  }, "Posted 12/05/2019")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, "\xD7")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "d-flex mb-3"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+    src: "https://source.unsplash.com/random/30x30",
+    className: "rounded-circle"
+  })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "mb-0"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+    className: "font-weight-bold"
+  }, "Lori "), "Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, quod."), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+    className: "text-muted"
+  }, "Posted 12/05/2019")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "pr-2"
+  }, "\xD7"))));
+};
+
+if ($target) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Comments, null), $target);
 }
 
 /***/ }),
@@ -69954,6 +70053,20 @@ var ImgActionBar = function ImgActionBar() {
     };
   }();
 
+  var handleShowComments = function handleShowComments() {
+    var $comments = document.getElementById("comments-section");
+
+    if ($comments) {
+      var styles = window.getComputedStyle($comments);
+
+      if (styles.getPropertyValue("display") === "none") {
+        $comments.style.display = "block";
+      } else {
+        $comments.style.display = "none";
+      }
+    }
+  };
+
   return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
     className: "d-flex justify-content-between pt-1"
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
@@ -69963,9 +70076,13 @@ var ImgActionBar = function ImgActionBar() {
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
     id: "heart",
     className: "".concat($liked ? "fas" : "far", " fa-heart fa-lg mr-1")
-  })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+  })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+    type: "button",
+    className: "btn btn-link p-0 text-reset",
+    onClick: handleShowComments
+  }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
     className: "far fa-comment fa-lg"
-  })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
+  }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
     className: "far fa-bookmark fa-lg"
   }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
     id: "likers-info"

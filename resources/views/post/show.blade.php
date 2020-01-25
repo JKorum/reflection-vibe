@@ -27,9 +27,13 @@
       </div>
 
       <hr class='mt-2 mb-2'>
-      <div>
+      <div class='mb-3'>
         {{ $post->caption }}
       </div>
+
+
+      <div id='comments-section'></div>
+
 
     </div>
   </div>

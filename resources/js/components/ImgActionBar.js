@@ -52,6 +52,18 @@ const ImgActionBar = () => {
         }
     };
 
+    const handleShowComments = () => {
+        const $comments = document.getElementById("comments-section");
+        if ($comments) {
+            const styles = window.getComputedStyle($comments);
+            if (styles.getPropertyValue("display") === "none") {
+                $comments.style.display = "block";
+            } else {
+                $comments.style.display = "none";
+            }
+        }
+    };
+
     return (
         <Fragment>
             <div className="d-flex justify-content-between pt-1">
@@ -69,7 +81,13 @@ const ImgActionBar = () => {
                         ></i>
                     </button>
 
-                    <i className="far fa-comment fa-lg"></i>
+                    <button
+                        type="button"
+                        className="btn btn-link p-0 text-reset"
+                        onClick={handleShowComments}
+                    >
+                        <i className="far fa-comment fa-lg"></i>
+                    </button>
                 </div>
                 <div>
                     <i className="far fa-bookmark fa-lg"></i>
