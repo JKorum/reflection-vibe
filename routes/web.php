@@ -20,6 +20,9 @@ Auth::routes();
 Route::get('/posts/create', 'PostController@create');
 Route::get('/posts/{post}', 'PostController@show');
 Route::post('/posts/{post}/like', 'LikeController@store');
+Route::post('/posts/{post}/comments', 'CommentController@store');
+Route::get('/posts/{post}/comments', 'CommentController@show');
+Route::delete('/posts/{post}/comments/{comment}', 'CommentController@delete');
 Route::get('/posts/{post}/likers', 'PostController@likers');
 Route::post('/posts', 'PostController@store');
 

@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use BeyondCode\Comments\Traits\HasComments;
 
 class Post extends Model
 {
+    use HasComments;
+
     protected $guarded = [];
 
     public function user()

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 
@@ -10,6 +10,15 @@ const $others = $target && +$target.dataset.others;
 const ImgActionBar = () => {
     const [likers, setLikers] = useState($likers);
     const [others, setOthers] = useState($others);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            updateLikersLine();
+        }, 20000);
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
 
     const updateLikersLine = async () => {
         const $likersInfo = document.getElementById("likers-info");

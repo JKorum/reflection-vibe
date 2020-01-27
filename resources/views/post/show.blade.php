@@ -4,7 +4,6 @@
 <div class="container">
   <div class="row">
     <div class="col">
-
       <div class='row mb-3'>
         <div class="col-2">
           <a href="/profiles/{{$post->user->id}}"><img src="{{ $post->user->profile->getAvatar() }}" class='rounded-circle w-100'></a>
@@ -32,7 +31,7 @@
       </div>
 
 
-      <div id='comments-section'></div>
+      <div id='comments-section' data-post-owner="{{ Auth::user()->id == $post->user_id ? 1 : 0 }}"></div>
 
 
     </div>
