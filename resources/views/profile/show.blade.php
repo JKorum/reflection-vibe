@@ -56,8 +56,16 @@
   <!-- transform into grid? -->
   <div class="row pt-1 pl-1">
     @foreach($posts as $post)
-    <div class="col-4 p-0 pb-1 pr-1">
+    <div class="col-4 p-0 pb-1 pr-1 position-relative post-img-container">
       <a href="/posts/{{ $post->id }}"><img src="/storage/{{ $post->image }}" class='w-100'></a>
+      <div class="position-absolute post-img-overlay pb-1 pr-1">
+        <div>
+          <i class="fas fa-heart"></i> {{ $post->likes()->count() }}
+        </div>
+        <div>
+          <i class="fas fa-comment"></i> {{ $post->comments()->count() }}
+        </div>
+      </div>
     </div>
     @endforeach
   </div>
