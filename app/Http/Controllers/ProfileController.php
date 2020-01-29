@@ -4,17 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Auth;
 use App\User;
-use Illuminate\Support\Facades\Gate;
 use App\Profile;
 use App\Post;
+use App\Http\Controllers\FollowController;
+
 
 class ProfileController extends Controller
 {
     public function show(User $user)
     {
+        $authUser = Auth::user();
+        $following = false;
+        if (isset($authUser)) {
+            $following = $user->profile->followers->contains($authUser->id);
+        }
+
+        $data = FollowController::count($user);
+        $firstFollowersNames = $data['firstFollowersNames'];
+        $restFollowers = $data['restFollowers'];
+
         $posts = Post::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
-        return view('profile.show', compact('user', 'posts'));
+        return view('profile.show', compact('user', 'posts', 'following', 'firstFollowersNames', 'restFollowers'));
     }
 
     public function edit(User $user)

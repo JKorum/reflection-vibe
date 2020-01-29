@@ -11,6 +11,8 @@
 |
 */
 
+
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -29,5 +31,8 @@ Route::post('/posts', 'PostController@store');
 Route::get('/profiles/{user}', 'ProfileController@show');
 Route::get('/profiles/{user}/edit', 'ProfileController@edit')->middleware('auth');
 Route::patch('/profiles/{user}', 'ProfileController@update')->middleware('auth');
+
+Route::get('/profiles/{user}/follow', 'FollowController@toggle');
+Route::get('/profiles/{user}/follow/count', 'FollowController@count');
 
 Route::get('/home', 'HomeController@index')->name('home');

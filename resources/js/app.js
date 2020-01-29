@@ -14,3 +14,5 @@ require("./bootstrap");
 require("./components/ImgActionBar");
 require("./components/ChooseImage");
 require("./components/Comments");
+require("./components/FollowButton");
+require("./components/ProfileInfo");

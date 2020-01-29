@@ -87307,6 +87307,10 @@ __webpack_require__(/*! ./components/ChooseImage */ "./resources/js/components/C
 
 __webpack_require__(/*! ./components/Comments */ "./resources/js/components/Comments.js");
 
+__webpack_require__(/*! ./components/FollowButton */ "./resources/js/components/FollowButton.js");
+
+__webpack_require__(/*! ./components/ProfileInfo */ "./resources/js/components/ProfileInfo.js");
+
 /***/ }),
 
 /***/ "./resources/js/bootstrap.js":
@@ -87736,6 +87740,163 @@ if ($target) {
 
 /***/ }),
 
+/***/ "./resources/js/components/FollowButton.js":
+/*!*************************************************!*\
+  !*** ./resources/js/components/FollowButton.js ***!
+  \*************************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+var $target = document.getElementById("follow-btn");
+var followingInit = $target && +$target.dataset.following;
+
+var FollowButton = function FollowButton() {
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(followingInit),
+      _useState2 = _slicedToArray(_useState, 2),
+      following = _useState2[0],
+      setFollowing = _useState2[1];
+
+  var handleFollow =
+  /*#__PURE__*/
+  function () {
+    var _ref = _asyncToGenerator(
+    /*#__PURE__*/
+    _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+      var path, userId, res;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              path = window.location.pathname;
+              userId = path.match(/\d+/)[0];
+              _context.next = 5;
+              return axios("/profiles/".concat(userId, "/follow"));
+
+            case 5:
+              res = _context.sent;
+
+              if (!(res.status === 200)) {
+                _context.next = 12;
+                break;
+              }
+
+              setFollowing(!following);
+              _context.next = 10;
+              return axios("/profiles/".concat(userId, "/follow/count"));
+
+            case 10:
+              res = _context.sent;
+
+              if (res.status === 200) {
+                buildFollowersLine(res.data);
+              }
+
+            case 12:
+              _context.next = 17;
+              break;
+
+            case 14:
+              _context.prev = 14;
+              _context.t0 = _context["catch"](0);
+              console.log(_context.t0);
+
+            case 17:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, null, [[0, 14]]);
+    }));
+
+    return function handleFollow() {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var buildFollowersLine = function buildFollowersLine(data) {
+    var $followersLine = document.getElementById("followers-info-line");
+    var $followers = document.getElementById("followers-total");
+    var firstFollowersNames = data.firstFollowersNames,
+        restFollowers = data.restFollowers,
+        followersTotal = data.followersTotal;
+
+    if ($followersLine && followersTotal > 0) {
+      var prefix = document.createElement("span");
+      prefix.innerText = "Followed by ";
+      var spans = firstFollowersNames.split(",").map(function (name, index, array) {
+        var span = document.createElement("span");
+        span.setAttribute("class", "font-weight-bold");
+        var text = document.createTextNode(name);
+        span.appendChild(text);
+
+        if (index !== array.length - 1) {
+          /* not last item -> add comma */
+          var comma = document.createElement("span");
+          comma.setAttribute("class", "font-weight-normal");
+          comma.innerText = ", ";
+          span.appendChild(comma);
+        }
+
+        return span;
+      });
+      /* altering DOM */
+
+      $followersLine.innerHTML = "";
+      $followersLine.appendChild(prefix);
+      spans.forEach(function (span) {
+        return $followersLine.appendChild(span);
+      });
+
+      if (restFollowers > 0) {
+        var rest = document.createElement("span");
+        rest.innerText = ", and +".concat(restFollowers, " more");
+        $followersLine.appendChild(rest);
+      }
+
+      if ($followers) {
+        $followers.innerText = followersTotal;
+      }
+    }
+  };
+
+  return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+    type: "button",
+    className: "btn btn-outline-primary btn-sm mt-2",
+    onClick: handleFollow
+  }, following ? "Unfollow" : "Follow");
+};
+
+if ($target) {
+  react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(FollowButton, null), $target);
+}
+
+/***/ }),
+
 /***/ "./resources/js/components/ImgActionBar.js":
 /*!*************************************************!*\
   !*** ./resources/js/components/ImgActionBar.js ***!
@@ -87960,6 +88121,81 @@ var ImgActionBar = function ImgActionBar() {
 
 if ($target) {
   react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(ImgActionBar, null), $target);
+}
+
+/***/ }),
+
+/***/ "./resources/js/components/ProfileInfo.js":
+/*!************************************************!*\
+  !*** ./resources/js/components/ProfileInfo.js ***!
+  \************************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+
+
+var $target = document.getElementById("profile-info-section");
+var posts = $target && $target.dataset.postsCount;
+var followers = $target && $target.dataset.profileFollowersCount;
+var following = $target && $target.dataset.profileFollowingCount;
+var firstFollowersNames = $target && $target.dataset.firstFollowersNames;
+var restFollowers = $target && +$target.dataset.restFollowers;
+
+var ProfileInfo = function ProfileInfo() {
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "row pb-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "col"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+    id: "followers-info-line"
+  }, followers > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, "Followed by", " ", firstFollowersNames.split(",").map(function (name, index, array) {
+    if (index === array.length - 1) {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        key: index,
+        className: "font-weight-bold"
+      }, name);
+    } else {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        key: index,
+        className: "font-weight-bold"
+      }, name, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+        className: "font-weight-normal"
+      }, ", "));
+    }
+  }), restFollowers > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+    className: "text-muted"
+  }, ", and +", restFollowers, " more") : null) : null))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "row border-top border-bottom p-2"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "col-4 text-center"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "m-0 font-weight-bold"
+  }, posts), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "m-0 text-muted"
+  }, "posts")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "col-4 text-center"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    id: "followers-total",
+    className: "m-0 font-weight-bold"
+  }, followers), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "m-0 text-muted"
+  }, "followers")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+    className: "col-4 text-center"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "m-0 font-weight-bold"
+  }, following), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+    className: "m-0 text-muted"
+  }, "following"))));
+};
+
+if ($target) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(ProfileInfo, null), $target);
 }
 
 /***/ }),
