@@ -87845,6 +87845,11 @@ var FollowButton = function FollowButton() {
         restFollowers = data.restFollowers,
         followersTotal = data.followersTotal;
 
+    if (followersTotal === 0 && $followersLine && $followers) {
+      $followersLine.innerHTML = "";
+      $followers.innerText = followersTotal;
+    }
+
     if ($followersLine && followersTotal > 0) {
       var prefix = document.createElement("span");
       prefix.innerText = "Followed by ";

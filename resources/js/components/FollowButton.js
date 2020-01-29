@@ -29,8 +29,12 @@ const FollowButton = () => {
   const buildFollowersLine = data => {
     const $followersLine = document.getElementById("followers-info-line");
     const $followers = document.getElementById("followers-total");
-
     const { firstFollowersNames, restFollowers, followersTotal } = data;
+
+    if (followersTotal === 0 && $followersLine && $followers) {
+      $followersLine.innerHTML = "";
+      $followers.innerText = followersTotal;
+    }
 
     if ($followersLine && followersTotal > 0) {
       const prefix = document.createElement("span");
