@@ -87217,6 +87217,208 @@ if (false) {} else {
 
 /***/ }),
 
+/***/ "./node_modules/uuid/lib/bytesToUuid.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/bytesToUuid.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]]
+  ]).join('');
+}
+
+module.exports = bytesToUuid;
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/lib/rng-browser.js":
+/*!**********************************************!*\
+  !*** ./node_modules/uuid/lib/rng-browser.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
+    return rnds8;
+  };
+} else {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var rnds = new Array(16);
+
+  module.exports = function mathRNG() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/uuid/v1.js":
+/*!*********************************!*\
+  !*** ./node_modules/uuid/v1.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var rng = __webpack_require__(/*! ./lib/rng */ "./node_modules/uuid/lib/rng-browser.js");
+var bytesToUuid = __webpack_require__(/*! ./lib/bytesToUuid */ "./node_modules/uuid/lib/bytesToUuid.js");
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+var _clockseq;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/uuidjs/uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid(b);
+}
+
+module.exports = v1;
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -87310,6 +87512,8 @@ __webpack_require__(/*! ./components/Comments */ "./resources/js/components/Comm
 __webpack_require__(/*! ./components/FollowButton */ "./resources/js/components/FollowButton.js");
 
 __webpack_require__(/*! ./components/ProfileInfo */ "./resources/js/components/ProfileInfo.js");
+
+__webpack_require__(/*! ./components/Date */ "./resources/js/components/Date.js");
 
 /***/ }),
 
@@ -87740,6 +87944,56 @@ if ($target) {
 
 /***/ }),
 
+/***/ "./resources/js/components/Date.js":
+/*!*****************************************!*\
+  !*** ./resources/js/components/Date.js ***!
+  \*****************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_moment__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-moment */ "./node_modules/react-moment/dist/index.js");
+/* harmony import */ var react_moment__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_moment__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+var $targets = document.getElementsByClassName("posted-ago");
+
+var Date = function Date(_ref) {
+  var date = _ref.date;
+  return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("small", {
+    className: "text-muted text-uppercase"
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_moment__WEBPACK_IMPORTED_MODULE_2___default.a, {
+    date: date,
+    fromNow: true
+  }));
+};
+
+if ($targets.length > 0) {
+  for (var i = 0; i < $targets.length; i++) {
+    var date = $targets[i].dataset.date;
+    /* convert from utc to local */
+
+    date = moment__WEBPACK_IMPORTED_MODULE_3___default.a.utc(date).local().format("YYYY-MM-DD HH:mm:ss");
+
+    if (date) {
+      react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(Date, {
+        date: date
+      }), $targets[i]);
+    }
+  }
+}
+
+/***/ }),
+
 /***/ "./resources/js/components/FollowButton.js":
 /*!*************************************************!*\
   !*** ./resources/js/components/FollowButton.js ***!
@@ -87917,8 +88171,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! uuid/v1 */ "./node_modules/uuid/v1.js");
+/* harmony import */ var uuid_v1__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(uuid_v1__WEBPACK_IMPORTED_MODULE_3__);
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -87937,89 +88191,100 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var $target = document.getElementById("img-action-bar");
-var $liked = $target && +$target.dataset.liked;
-var $likers = $target && $target.dataset.likers;
-var $others = $target && +$target.dataset.others;
+var $targets = document.getElementsByClassName("img-action-bars");
+var heartId = uuid_v1__WEBPACK_IMPORTED_MODULE_3___default()();
+var likersInfoId = uuid_v1__WEBPACK_IMPORTED_MODULE_3___default()();
 
-var ImgActionBar = function ImgActionBar() {
-  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])($likers),
+var ImgActionBar = function ImgActionBar(_ref) {
+  var dataset = _ref.target.dataset,
+      autoUpdate = _ref.autoUpdate;
+
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(+dataset.liked),
       _useState2 = _slicedToArray(_useState, 2),
-      likers = _useState2[0],
-      setLikers = _useState2[1];
+      liked = _useState2[0],
+      setLiked = _useState2[1];
 
-  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])($others),
+  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(dataset.likers),
       _useState4 = _slicedToArray(_useState3, 2),
-      others = _useState4[0],
-      setOthers = _useState4[1];
+      likers = _useState4[0],
+      setLikers = _useState4[1];
+
+  var _useState5 = Object(react__WEBPACK_IMPORTED_MODULE_1__["useState"])(+dataset.others),
+      _useState6 = _slicedToArray(_useState5, 2),
+      others = _useState6[0],
+      setOthers = _useState6[1];
 
   Object(react__WEBPACK_IMPORTED_MODULE_1__["useEffect"])(function () {
-    var timer = setInterval(function () {
-      updateLikersLine();
-    }, 20000);
-    return function () {
-      clearInterval(timer);
-    };
+    /* enable auto update only for post page */
+    if (autoUpdate) {
+      var timer = setInterval(function () {
+        updateLikersLine();
+      }, 20000);
+      return function () {
+        clearInterval(timer);
+      };
+    }
   }, []);
 
   var updateLikersLine =
   /*#__PURE__*/
   function () {
-    var _ref = _asyncToGenerator(
+    var _ref2 = _asyncToGenerator(
     /*#__PURE__*/
     _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-      var $likersInfo, path, postId, res, _res$data, _likers, _others;
+      var $likersInfo, postId, res, _res$data, _likers, _others, authUserLikedPost;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              $likersInfo = document.getElementById("likers-info");
+              $likersInfo = document.getElementById(likersInfoId);
 
               if (!$likersInfo) {
-                _context.next = 14;
+                _context.next = 13;
                 break;
               }
 
               _context.prev = 2;
-              path = window.location.pathname;
-              postId = path.match(/\d+/)[0];
-              _context.next = 7;
-              return axios__WEBPACK_IMPORTED_MODULE_3___default.a.get("/posts/".concat(postId, "/likers"));
+              postId = dataset.postId;
+              _context.next = 6;
+              return axios.get("/posts/".concat(postId, "/likers"));
 
-            case 7:
+            case 6:
               res = _context.sent;
 
               if (res.status === 200) {
-                _res$data = _slicedToArray(res.data, 2), _likers = _res$data[0], _others = _res$data[1];
+                _res$data = res.data, _likers = _res$data.likers, _others = _res$data.others, authUserLikedPost = _res$data.authUserLikedPost;
+                setLiked(authUserLikedPost);
                 setLikers(_likers);
                 setOthers(_others);
               }
 
-              _context.next = 14;
+              _context.next = 13;
               break;
 
-            case 11:
-              _context.prev = 11;
+            case 10:
+              _context.prev = 10;
               _context.t0 = _context["catch"](2);
               console.log(_context.t0);
 
-            case 14:
+            case 13:
             case "end":
               return _context.stop();
           }
         }
-      }, _callee, null, [[2, 11]]);
+      }, _callee, null, [[2, 10]]);
     }));
 
     return function updateLikersLine() {
-      return _ref.apply(this, arguments);
+      return _ref2.apply(this, arguments);
     };
   }();
 
   var handleLikeDislike =
   /*#__PURE__*/
   function () {
-    var _ref2 = _asyncToGenerator(
+    var _ref3 = _asyncToGenerator(
     /*#__PURE__*/
     _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
       var postId, heart, res;
@@ -88027,8 +88292,8 @@ var ImgActionBar = function ImgActionBar() {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              postId = $target.dataset.postId;
-              heart = document.getElementById("heart");
+              postId = dataset.postId;
+              heart = document.getElementById(heartId);
 
               if (!(postId && heart)) {
                 _context2.next = 13;
@@ -88037,19 +88302,17 @@ var ImgActionBar = function ImgActionBar() {
 
               _context2.prev = 3;
               _context2.next = 6;
-              return axios__WEBPACK_IMPORTED_MODULE_3___default.a.post("/posts/".concat(postId, "/like"));
+              return axios.post("/posts/".concat(postId, "/like"));
 
             case 6:
               res = _context2.sent;
 
               if (res.status === 200) {
-                /* add heart background */
+                /* toggle heart background */
                 if (heart.classList.contains("far")) {
-                  heart.classList.remove("far");
-                  heart.classList.add("fas");
+                  setLiked(1);
                 } else {
-                  heart.classList.remove("fas");
-                  heart.classList.add("far");
+                  setLiked(0);
                 }
 
                 updateLikersLine();
@@ -88072,9 +88335,11 @@ var ImgActionBar = function ImgActionBar() {
     }));
 
     return function handleLikeDislike() {
-      return _ref2.apply(this, arguments);
+      return _ref3.apply(this, arguments);
     };
   }();
+  /* used in post.show */
+
 
   var handleShowComments = function handleShowComments() {
     var $comments = document.getElementById("comments-section");
@@ -88097,8 +88362,8 @@ var ImgActionBar = function ImgActionBar() {
     className: "btn btn-link p-0 text-reset",
     onClick: handleLikeDislike
   }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
-    id: "heart",
-    className: "".concat($liked ? "fas" : "far", " fa-heart fa-lg mr-1")
+    id: heartId,
+    className: "".concat(liked ? "fas" : "far", " fa-heart fa-lg mr-1")
   })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
     type: "button",
     className: "btn btn-link p-0 text-reset",
@@ -88108,7 +88373,7 @@ var ImgActionBar = function ImgActionBar() {
   }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
     className: "far fa-bookmark fa-lg"
   }))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-    id: "likers-info"
+    id: likersInfoId
   }, likers && react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("small", null, "Liked by", " ", react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, likers.split(",").map(function (name, i, array) {
     return i + 1 === array.length ? react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1__["Fragment"], {
       key: name
@@ -88121,11 +88386,23 @@ var ImgActionBar = function ImgActionBar() {
     }, name), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", null, ","));
   })), others ? react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
     className: "text-muted"
-  }, " ", "and ", others, " others") : null)));
+  }, " and ", others, " others") : null)));
 };
 
 if ($target) {
-  react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(ImgActionBar, null), $target);
+  react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(ImgActionBar, {
+    target: $target,
+    autoUpdate: true
+  }), $target);
+}
+
+if ($targets.length > 0) {
+  for (var i = 0; i < $targets.length; i++) {
+    react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(ImgActionBar, {
+      target: $targets[i],
+      autoUpdate: false
+    }), $targets[i]);
+  }
 }
 
 /***/ }),

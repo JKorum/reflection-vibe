@@ -16,3 +16,4 @@ require("./components/ChooseImage");
 require("./components/Comments");
 require("./components/FollowButton");
 require("./components/ProfileInfo");
+require("./components/Date");

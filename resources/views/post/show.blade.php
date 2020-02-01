@@ -22,6 +22,7 @@
         <img src="/storage/{{ $post->image }}" class="img-fluid">
       </div>
 
+      <!-- React component ImgActionBar.js -->
       <div id="img-action-bar" data-post-id="{{ $post->id }}" data-liked="{{ $liked }}" data-likers="{{ $likers }}" data-others="{{ $others }}">
       </div>
 
@@ -30,7 +31,7 @@
         {{ $post->caption }}
       </div>
 
-
+      <!-- React component Comments.js -->
       <div id='comments-section' data-post-owner="{{ Auth::user()->id == $post->user_id ? 1 : 0 }}"></div>
 
 

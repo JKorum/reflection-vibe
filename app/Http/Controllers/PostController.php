@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use \App\User;
 use \App\Post;
-use \App\Like;
 
 class PostController extends Controller
 {
@@ -16,18 +15,24 @@ class PostController extends Controller
         $this->middleware('auth');
     }
 
+    /* view posts of following users */
+    public function index()
+    {
+        $user = Auth::user();
+        $ids = $user->following->pluck('user_id');
+        $posts = Post::whereIn('user_id', $ids)->orderBy('created_at', 'desc')->get();
+
+        return view('post.index', compact('posts'));
+    }
+
+    /* view one post */
     public function show(Post $post)
     {
-        /* find out if user liked post */
-        $liked = Like::where("user_id", Auth::user()->id)->where("post_id", $post->id)->get();
-        $liked = isset($liked[0]) ? 1 : 0;
+        $liked = $post->authUserLikedPost();
 
-        $result = $this->countLikers($post);
+        $result = $post->countLikers();
         $likers = $result[0];
         $others = $result[1];
-
-        /* get auth user username */
-        $username = Auth::user()->username;
 
         return view('post.show', compact('post', 'liked', 'likers', 'others'));
     }
@@ -36,36 +41,18 @@ class PostController extends Controller
     {
         $postId = $request->segment(2);
         $post = Post::find($postId);
-        return $this->countLikers($post);
-    }
 
-    public function countLikers(Post $post)
-    {
-        /* count likes */
-        $likesCount = $post->likes()->count();
+        $result = $post->countLikers();
+        $likers = $result[0];
+        $others = $result[1];
 
-        /* find likers */
-        $likers = '';
-        $others = 0;
-        if ($likesCount > 0) {
-            for ($i = 0; $i < $likesCount; $i++) {
-                $username = $post->likes[$i]->user->username;
-                if ($i === $likesCount - 1) {
-                    $likers .= $username;
-                    break;
-                } elseif ($i === 2) {
-                    $likers .= $username;
-                    break;
-                } else {
-                    $likers .= "$username, ";
-                }
-            }
-            if ($likesCount > 3) {
-                $others = $likesCount - 3;
-            }
-        }
+        $authUserLikedPost = $post->authUserLikedPost();
 
-        return [$likers, $others];
+        return [
+            "likers" => $likers,
+            "others" => $others,
+            "authUserLikedPost" => $authUserLikedPost
+        ];
     }
 
     public function create()
