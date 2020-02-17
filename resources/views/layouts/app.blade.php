@@ -19,69 +19,77 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
+    <!-- animations -->
+    <link rel="stylesheet" href="{{ asset('css/animate.min.css') }}">
     <!-- icons -->
     <script src="https://kit.fontawesome.com/df3682f87e.js" crossorigin="anonymous"></script>
+
+    <script src="{{ asset('js/navbar.js') }}" defer></script>
 </head>
 
 <body>
-    <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+    <div id="app" class="position-relative">
+
+        <nav id='navbar' class="navbar navbar-expand-md navbar-light bg-white fixed-top">
             <div class="container">
-                <a class="navbar-brand" href="#">
+                <div class="navbar-brand">
+                    @auth
+                    <a href="/posts" class='text-decoration-none text-reset'>
+                        <i class="fas fa-camera-retro"></i>
+                        <span id='project-name' class="animated faster">Reflection Vibe</span>
+                    </a>
+                    @endauth
+                    @guest
                     <i class="fas fa-camera-retro"></i>
                     Reflection Vibe
-                </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
-
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Authentication Links -->
-                        @guest
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                        </li>
-                        @if (Route::has('register'))
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                        </li>
-                        @endif
-                        @else
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }} <span class="caret"></span>
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
-                                <a class="dropdown-item" href="/profiles/{{ Auth::user()->id }}/edit">Profile</a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                        @endguest
-                    </ul>
+                    @endguest
                 </div>
+
+                <ul class="navbar-nav ml-auto d-flex flex-row">
+                    @auth
+                    <li class="nav-item px-2">
+                        <i class="far fa-compass fa-lg"></i>
+                    </li>
+
+                    <li class="nav-item px-2">
+                        <i class="far fa-heart fa-lg"></i>
+                    </li>
+
+                    <li class="nav-item px-2">
+                        <a href="/profiles/{{Auth::user()->id}}" class='text-decoration-none text-reset'>
+                            <i class="far fa-user fa-lg"></i>
+                        </a>
+                    </li>
+
+                    <li class="nav-item px-2">
+                        <a href="{{ route('logout') }}" class='text-decoration-none text-reset'>
+                            <i class="fas fa-sign-out-alt fa-lg" onclick="event.preventDefault(); 
+                                document.getElementById('logout-form').submit();"></i>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </li>
+                    @endauth
+                    @guest
+                    <li class="nav-item px-2">
+                        <a class="nav-link" href="{{ route('login') }}">Login</a>
+                    </li>
+                    @if (Route::has('register'))
+                    <li class="nav-item px-2">
+                        <a class="nav-link" href="{{ route('register') }}">Register</a>
+                    </li>
+                    @endif
+                    @endguest
+                </ul>
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="py-5 mt-4">
             @yield('content')
         </main>
     </div>
+
 </body>
 
 </html>

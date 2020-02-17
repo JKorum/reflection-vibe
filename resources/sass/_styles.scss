@@ -1,26 +1,36 @@
 #comments-section {
-    display: none;
+  display: none;
 }
 
 .post-img-overlay {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    background-clip: content-box;
-    background-color: rgba(0, 0, 0, 0.3);
-    color: $white;
-    display: none;
-    pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-clip: content-box;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: $white;
+  display: none;
+  pointer-events: none;
 
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .post-img-container:hover {
-    .post-img-overlay {
-        display: flex;
-    }
+  .post-img-overlay {
+    display: flex;
+  }
+}
+
+.navbar {
+  color: $black !important;
+  border-bottom: 0.6px solid rgba(0, 0, 0, 0.2);
+  transition: padding 200ms linear;
+
+  .navbar-brand {
+    color: $black !important;
+  }
 }

@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,5 +11,11 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.react('resources/js/app.js', 'public/js')
-   .sass('resources/sass/app.scss', 'public/css');
+mix
+  .react("resources/js/app.js", "public/js")
+  .sass("resources/sass/app.scss", "public/css")
+  .styles(
+    "node_modules/animate.css/animate.min.css",
+    "public/css/animate.min.css"
+  )
+  .scripts("resources/js/helpers/navbar.js", "public/js/navbar.js");
